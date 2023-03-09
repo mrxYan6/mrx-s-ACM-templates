@@ -30,6 +30,7 @@ struct hashtable {
 		return val.back();
 	}
 };
+
 int main(){
     int x = 1;
     std::cout << x << '\n';
