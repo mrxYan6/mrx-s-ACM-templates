@@ -22,7 +22,6 @@ Pd polycenter(polygen a) {
 bool point_in_polygon(Pd p, polygen a) {
 	int n = a.size();
 	int s = 0;
-	a[n + 1] = a[1];
 	for (int i = 0; i < n; i++) {
 		Pd u = a[i], v = a[(i + 1) % n];
 		if (onSeg(p, u, v))return true;
