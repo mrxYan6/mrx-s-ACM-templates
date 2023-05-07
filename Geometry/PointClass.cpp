@@ -55,7 +55,7 @@ struct Point {
 
 	friend T dot(const Point& lhs, const Point& rhs) { return lhs.x * rhs.x + lhs.y * rhs.y; }
 
-	friend double angle(const Point& rhs) { return atan2(rhs.x, rhs.y); }
+	friend double angle(const Point& rhs) { return atan2(rhs.y, rhs.x); }
 
 	Point rotate90() const { return {y, x}; }
 
