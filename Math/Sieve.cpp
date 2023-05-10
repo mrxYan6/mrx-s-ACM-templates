@@ -12,7 +12,7 @@ void sieve(int n) {
         }
         for (auto p: primes) {
             if (p * i > n)break;
-            minp[i * p] = 1;
+            minp[i * p] = p;
             if (p == minp[i]) {
                 phi[i * p] = phi[i] * p;
                 break;
