@@ -1,33 +1,27 @@
-using ll = long long;
-ll exgcd(ll aa,long long bb,ll &x,ll &y){
-	if(bb == 0){
-		x = 1,y = 0;
-		return aa;
+using i64 = long long;
+
+std::array<i64, 3> exgcd(i64 a, i64 b) {
+	if (!b) {
+		return {a, 1, 0};
 	}
-	ll d = exgcd(bb,aa % bb,x,y);
-	ll t = x;
-	x = y;
-	y = t - aa / bb * x;
-	return d;
+	auto [g, x, y] = exgcd(b, a % b);
+	return {g, y, x - a / b * y};
 }
 
-long long LCM;
-
-long long EXCRT(int n){
-	long long R, c, xi, yi, gcd, t;
-	LCM = m[0];
-	R = a[0];
-	for(int i = 1;i < n;++i){
-		gcd = exgcd(LCM, m[i], xi, yi);
-		c = a[i] - X;
-		if(c % gcd)return -1;
-		t = m[i] / gcd;
-		xi = c / gcd * xi % t;
-		X += LCM * xi;
-		LCM = LCM / gcd * m[i];
-		X %= LCM;
+auto EXCRT = [&] (int n) {
+	i64 xi, yi, gcd, c;
+	i64 LCM = m[0], x0 = b[0];
+	for (int i = 1; i < n; ++i) {
+		auto [gcd, xi, yi] = exgcd(LCM, m[i]);
+		c = b[i] - x0;
+		if (c % gcd) return -1ll;
+		i64 t = m[i] / gcd;
+		xi = (xi * (c / gcd) % t + t) % t;
+		x0 += xi * LCM;
+		LCM *= m[i] / gcd;
+		x0 %= LCM;
 	}
-	X = (X + LCM) % LCM;
-	if(X == 0)X = LCM;
-	return X;
-}
+	x0 = (x0 + LCM) % LCM;
+	if(x0 == 0) x0 = LCM;
+	return x0;
+}; 

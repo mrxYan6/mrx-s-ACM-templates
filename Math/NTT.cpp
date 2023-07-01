@@ -254,10 +254,8 @@ struct Poly : public std::vector<Z> {
 		return ans;
 	}
 };
-\end{lstlisting}
-\newpage
-\subsubsection{FFT}
-\begin{lstlisting}
+
+
 using i64 = long long;
 using Z = std::complex<long double>;
 const double pi = std::acos(-1);
