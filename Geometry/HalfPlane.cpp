@@ -1,3 +1,7 @@
+bool onLeft(Pd p, Ld l) {
+	return cross(l.v, p - l.a) > 0;
+}
+
 polygen hp(std::vector<Ld>& lines) {
 	std::sort(lines.begin(), lines.end(), [&](auto l1, auto l2) {
 		auto d1 = l1.v;
