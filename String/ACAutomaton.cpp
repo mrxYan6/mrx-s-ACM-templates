@@ -1,84 +1,103 @@
-#include <iostream>
-#include <queue>
+template <int alphabet_size>
+struct AhoCorasick {
+    struct node {
+        int len, cnt;
+        int fail;
+        std::array<int,alphabet_size> next;
 
+        node() : len(), fail(0), cnt(0) {
+            next.fill(0);
+        }
 
-using namespace std;
+    };  
+    std::vector<node> t;
 
-const int N = 1e5+100;
+    int New() {
+        t.emplace_back();
+        return t.size() - 1;
+    }
 
-struct Trie
-{
-	int cnt;
-	Trie* nxt[2];
-	Trie* fail;
-	bool vis;
-	Trie(){
-		cnt=0;
-		vis=0;
-		for(auto &x:nxt)x=nullptr;
-	}
+    AhoCorasick() {
+        New();
+        t[0].fail = 0;
+        t[0].len = -1;
+        t[0].cnt = 0;
+        t[0].next.fill(1);
+        New();
+    }
+
+    void insert (const std::vector<int> & s) {
+        int now = 1;
+        for (auto c : s){
+            if (!t[now].next[c]) {
+                t[now].next[c] = New();
+                t[t[now].next[c]].len = t[now].len + 1;
+            }
+            now = t[now].next[c];
+            t[now].cnt++;
+        }
+    }
+
+    void insert (const std::string &s, char offset = 'a') {
+        std::vector<int> v(s.size());
+        for (int i = 0; i < s.size(); ++i) {
+            v[i] = s[i] - offset;
+        }
+        insert(v);
+    }
+
+    void build() {
+        std::queue<int> q;
+
+        q.emplace(1);
+        while(!q.empty()) {
+            auto x = q.front();
+            q.pop();
+
+            for (int i = 0; i < alphabet_size; ++i) {
+                if (t[x].next[i] == 0) {
+                    t[x].next[i] = t[t[x].fail].next[i];
+                } else {
+                    t[t[x].next[i]].fail = t[t[x].fail].next[i];
+                    q.push(t[x].next[i]);
+                }
+            }
+        }
+    }
+
+    int query_end(const std::vector<int> b) {
+        int x = 1;
+        for (auto c : b) {
+            x = t[x].next[c];
+        }
+        return x;
+    }
+
+    int query_end(const std::string s, char offset = 'a') {
+        std::vector<int> b(s.size());
+        for (int i = 0; i < s.size(); ++i) {
+            b[i] = s[i] - offset;
+        }
+        return query_end(b);
+    }
+
+    int next(int p, int x) {
+        return t[p].next[x];
+    }
+
+    int next(int p, char x, char offset = 'a') {
+        return next(p, x - offset);
+    }
+
+    int fail(int p) {
+        return t[p].fail;
+    }
+
+    int len(int p) {
+        return t[p].len;
+    }
+
+    int size() {
+        return t.size();
+    }
 };
-
-void clear(Trie*root){
-	for(auto x:root->nxt){
-		if(x!=nullptr){
-			clear(x);
-		}
-	}
-	root->vis=0;
-}
-void insert(Trie*root,string&s){
-	Trie*p = root;
-	for(auto x:s){
-		int id = x-'0';
-		if(p->nxt[id]==nullptr){
-			Trie*tmp = new Trie;
-			p->nxt[id]=tmp;
-		}
-		p=p->nxt[id];
-	}
-	p->cnt++;
-}
-void build(Trie*root){
-	queue<Trie*>Q;
-	Trie *p = root;
-	root->fail=nullptr;
-	Q.push(p);
-	while(!Q.empty()){
-		p=Q.front();
-		Q.pop();
-		for(int i = 0; i < 2; ++i){
-			if(p->nxt[i]!=nullptr){
-				if(p==root)p->nxt[i]->fail=p;
-				else {
-					Trie*tmp = p->fail;
-					while(tmp!=nullptr){
-						if(tmp->nxt[i]!=nullptr){
-							p->nxt[i]->fail=tmp->nxt[i];
-							break;
-						}
-						tmp=tmp->fail;
-					}
-					if(tmp == nullptr)p->nxt[i]->fail=root;
-				}
-			}
-			Q.push(p->nxt[i]);
-		}
-	}
-}
-int qry(Trie*root,string&s){
-	int ans = 0;
-	Trie*p = root;
-	for(auto x: s){
-		int id = x - '0';
-		while(p->nxt[id]==nullptr&&p!=root)p=p->fail;
-		p=p->nxt[id];
-		if(p==nullptr)p=root;
-		Trie*tmp = p;
-		while(tmp!=root&&!tmp->vis){
-			ans+=tmp->cnt;
-			tmp->vis=1;
-			tmp=tmp->fail;
-		}
-	}
-}
