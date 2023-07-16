@@ -1,4 +1,5 @@
 
+
 using i64 = long long;
 using db = double;
 constexpr db eps = 1e-6;
@@ -41,7 +42,7 @@ struct Point {
 
 	friend db abs(const Point& lhs) { return std::sqrt(lhs.x * lhs.x + lhs.y * lhs.y); }
 
-	friend i64 abs2(const Point& lhs) { return (lhs.x * lhs.x + lhs.y * lhs.y); }
+	friend T abs2(const Point& lhs) { return (lhs.x * lhs.x + lhs.y * lhs.y); }
 
 	friend T cross(const Point& lhs, const Point& rhs) { return lhs.x * rhs.y - lhs.y * rhs.x; }
 
@@ -49,7 +50,7 @@ struct Point {
 
 	friend db angle(const Point& rhs) { return atan2(rhs.y, rhs.x); }
 
-	Point rotate90() const { return {y, x}; }
+	Point rotate90() const { return {-y, x}; }
 
 	Point<db> rotate(db deg) { return {x * cos(deg) - y * sin(deg), x * sin(deg) + y * cos(deg)}; }
 

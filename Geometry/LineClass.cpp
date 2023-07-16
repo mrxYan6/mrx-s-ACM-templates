@@ -1,4 +1,5 @@
 
+
 using i64 = long long;
 using db = double;
 constexpr db eps = 1e-6;
@@ -49,7 +50,7 @@ struct Point {
 
 	friend db angle(const Point& rhs) { return atan2(rhs.y, rhs.x); }
 
-	Point rotate90() const { return {y, x}; }
+	Point rotate90() const { return {-y, x}; }
 
 	Point<db> rotate(db deg) { return {x * cos(deg) - y * sin(deg), x * sin(deg) + y * cos(deg)}; }
 
@@ -91,8 +92,8 @@ struct Line {
 	}
 };
 
-using Pd = Point<db>;
 using Ld = Line<db>;
+using Ll = Line<i64>;
 
 bool isCross(Pd a, Pd b, Pd i, Pd j) {
 	return sgn(cross(i - a, j - i)) * sgn(cross(i - b, j - i)) == -1 && sgn(cross(b - i, a - b)) * sgn(cross(b - j, a - b)) == -1;
@@ -102,6 +103,7 @@ bool onSeg(Pd a, Pd i, Pd j) {
 	return sgn(cross(i - a, j - a)) == 0 && sgn(dot(a - i, a - j)) < 0;
 }
 
-bool onLeft(Pd p, Ld l) {
+bool onLeft(Pl p, Ll l) {
 	return cross(l.v, p - l.a) > 0;
 }
+
