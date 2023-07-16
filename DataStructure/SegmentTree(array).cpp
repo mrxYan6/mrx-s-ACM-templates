@@ -1,16 +1,16 @@
 #include <bits/stdc++.h>
 
-using ll = long long;
-const ll INF = 1e18;
+using i64 = long long;
+const i64 INF = 1e18;
 
 struct SegmentTree {
     struct Nod {
         int l, r;
-        ll sum, tag1, tag2;//tag1为加，tag2为改变
+        i64 sum, tag1, tag2;//tag1为加，tag2为改变
 
         Nod(int l = 0, int r = 0) : l(l), r(r), sum(0), tag1(0), tag2(INF) {}
 
-        inline void apply(ll v1, ll v2) {
+        inline void apply(i64 v1, i64 v2) {
             if (v2 != INF) {
                 tag2 = v2;
                 sum = v2;
