@@ -8,7 +8,7 @@ std::array<i64, 3> exgcd(i64 a, i64 b) {
 	return {g, y, x - a / b * y};
 }
 
-auto EXCRT = [&] (int n) {
+auto EXCRT = [] (int n, const std::vector<int>& b, const std::vector<int>& m) {
 	i64 xi, yi, gcd, c;
 	i64 LCM = m[0], x0 = b[0];
 	for (int i = 1; i < n; ++i) {
