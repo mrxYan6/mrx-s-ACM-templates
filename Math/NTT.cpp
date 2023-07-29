@@ -1,4 +1,7 @@
-using Z = ModInt;
+
+const i64 P = 998244353;
+
+using Z = Modular<P>;
 std::vector<int> rev;
 std::vector<Z> roots{0, 1};
 
@@ -64,6 +67,24 @@ struct Poly : public std::vector<Z> {
 	Z& operator [](int idx) {
 		return *(this->begin() + idx);
 	}
+    
+    Poly shift(int k) const {
+        if (k >= 0) {
+            auto b = *this;
+            b.insert(b.begin(), k, 0);
+            return b;
+        } else if(this-> size() <= -k) {
+            return Poly{};
+        } else {
+            return Poly(this->begin() + (-k), this->end());
+        }
+    }
+
+    Poly trunc(int k) const {
+        Poly b(*this);
+        b.resize(k);
+        return b;
+    }
 
 	friend Poly operator +(const Poly& a, const Poly& b) {
 		Poly res(std::max(a.size(), b.size()));
@@ -98,7 +119,7 @@ struct Poly : public std::vector<Z> {
 			a[i] = a[i] * inv;
 		}
 		idft(a);
-		return Poly(a).modxk(tot);
+		return Poly(a).trunc(tot);
 	}
 
 	friend Poly operator *(int a, Poly b) {
@@ -113,35 +134,6 @@ struct Poly : public std::vector<Z> {
 			a[i] = a[i] * b;
 		}
 		return a;
-	}
-
-	Poly operator <<(const int k) const {
-		auto b = *this;
-		b.insert(b.begin(), k, 0);
-		return b;
-	}
-
-	Poly operator >>(const int k) const {
-		if (size() <= k) {
-			return {};
-		}
-		return Poly(begin() + k, end());
-	}
-
-	Poly mulxk(int k) const {
-		return *this << k;
-	}
-
-	Poly modxk(int k) const {
-		k = std::min(k, (int) size());
-		return Poly(begin(), begin() + k);
-	}
-
-	Poly divxk(int k) const {
-		if (size() <= k) {
-			return {};
-		}
-		return Poly(begin() + k, end());
 	}
 
 
@@ -169,13 +161,13 @@ struct Poly : public std::vector<Z> {
 		int k = 1;
 		while (k < m) {
 			k *= 2;
-			x = (x * (Poly{2} - modxk(k) * x)).modxk(k);
+			x = (x * (Poly{2} - trunc(k) * x)).trunc(k);
 		}
-		return x.modxk(m);
+		return x.trunc(m);
 	}
 
 	Poly log(int m) const {
-		return (deriv() * inv(m)).integr().modxk(m);
+		return (deriv() * inv(m)).integr().trunc(m);
 	}
 
 	Poly exp(int m) const {
@@ -183,9 +175,9 @@ struct Poly : public std::vector<Z> {
 		int k = 1;
 		while (k < m) {
 			k *= 2;
-			x = (x * (Poly{Z(1)} - x.log(k) + modxk(k))).modxk(k);
+			x = (x * (Poly{Z(1)} - x.log(k) + trunc(k))).trunc(k);
 		}
-		return x.modxk(m);
+		return x.trunc(m);
 	}
 
 	Poly pow(int k, int m) const {
@@ -197,8 +189,9 @@ struct Poly : public std::vector<Z> {
 			return Poly(m);
 		}
 		Z v = (*this)[i];
-		Poly f = divxk(i) * (v.inv().val());
-		return (f.log(m - i * k) * k).exp(m - i * k).mulxk(i * k) * power(v, k).val();
+		auto f = shift(-i) * (v.inv().val());
+        int mult = k > 0 ? power(v, k).val() : power(v.inv(), -k).val();
+		return (f.log(m - i * k) * k).exp(m - i * k).shift(i * k) * mult;
 	}
 
 	Poly sqrt(int m) const {
@@ -206,9 +199,9 @@ struct Poly : public std::vector<Z> {
 		int k = 1;
 		while (k < m) {
 			k *= 2;
-			x = (x + (modxk(k) * x.inv(k)).modxk(k)) * ((P + 1) / 2);
+			x = (x + (trunc(k) * x.inv(k)).trunc(k)) * ((P + 1) / 2);
 		}
-		return x.modxk(m);
+		return x.trunc(m);
 	}
 
 	Poly mulT(Poly b) const {
@@ -217,7 +210,7 @@ struct Poly : public std::vector<Z> {
 		}
 		int n = b.size();
 		std::reverse(b.begin(), b.end());
-		return ((*this) * b).divxk(n - 1);
+		return ((*this) * b).shift(-(n - 1));
 	}
 
 	std::vector<Z> eval(std::vector<Z> x) const {
@@ -246,159 +239,11 @@ struct Poly : public std::vector<Z> {
 				}
 			} else {
 				int m = (l + r) / 2;
-				work(2 * p, l, m, num.mulT(q[2 * p + 1]).modxk(m - l));
-				work(2 * p + 1, m, r, num.mulT(q[2 * p]).modxk(r - m));
+				work(2 * p, l, m, num.mulT(q[2 * p + 1]).trunc(m - l));
+				work(2 * p + 1, m, r, num.mulT(q[2 * p]).trunc(r - m));
 			}
 		};
 		work(1, 0, n, mulT(q[1].inv(n)));
 		return ans;
 	}
-};
-
-
-using i64 = long long;
-using Z = std::complex<long double>;
-const double pi = std::acos(-1);
-std::vector<int> rev;
-std::vector<Z> roots{(0, 1), (0, 1)};
-
-void dft(std::vector<Z>& a) {
-	int n = a.size();
-
-	if (int(rev.size()) != n) {
-		rev.resize(n);
-		for (int i = 0; i < n; ++i) {
-			rev[i] = (rev[i >> 1] >> 1) | ((i & 1) ? n >> 1 : 0);
-		}
-	}
-
-	for (int i = 0; i < n; ++i) {
-		if (rev[i] < i)std::swap(a[i], a[rev[i]]);
-	}
-	if (int(roots.size() < n)) {
-		int k = __builtin_ctz(roots.size());
-		roots.resize(n);
-		while ((1 << k) < n) {
-			Z e(cos(acos(-1) / (1 << k)), sin(acos(-1) / (1 << k)));
-			for (int i = 1 << (k - 1); i < (1 << k); i++) {
-				roots[i << 1] = roots[i];
-				roots[i << 1 | 1] = roots[i] * e;
-			}
-			k++;
-		}
-	}
-
-	for (int k = 1; k < n; k *= 2) {
-		for (int i = 0; i < n; i += 2 * k) {
-			for (int j = 0; j < k; j++) {
-				Z u = a[i + j];
-				Z v = a[i + j + k] * roots[k + j];
-				a[i + j] = u + v;
-				a[i + j + k] = u - v;
-			}
-		}
-	}
-}
-
-void idft(std::vector<Z>& a) {
-	int n = a.size();
-	std::reverse(a.begin() + 1, a.end());
-	dft(a);
-}
-
-struct Poly : public std::vector<i64> {
-	using std::vector<i64>::vector;
-
-	Poly() {}
-
-	Poly(const std::vector<i64>& a) : std::vector<i64>(a) {}
-
-	Poly(const std::initializer_list<i64>& a) : std::vector<i64>(a) {}
-
-	i64 operator [](int idx) const {
-		if (idx > size())return 0;
-		else return *(begin() + idx);
-	}
-
-	i64& operator [](int idx) { return *(begin() + idx); }
-
-	friend Poly operator +(const Poly& a, const Poly& b) {
-		Poly res(std::max(a.size(), b.size()));
-		for (int i = 0; i < int(res.size()); i++) {
-			res[i] = a[i] + b[i];
-		}
-		return res;
-	}
-
-	friend Poly operator -(const Poly& a, const Poly& b) {
-		Poly res(std::max(a.size(), b.size()));
-		for (int i = 0; i < int(res.size()); i++) {
-			res[i] = a[i] - b[i];
-		}
-		return res;
-	}
-
-	friend Poly operator *(const Poly& a, const Poly& b) {
-		if (a.size() == 0 || b.size() == 0) {
-			return Poly();
-		}
-		int sz = 1, tot = a.size() + b.size() - 1;
-		while (sz < tot) {
-			sz *= 2;
-		}
-		std::vector<Z> f(sz);
-		for (int i = 0; i < a.size(); ++i)f[i].real(a[i]);
-		for (int i = 0; i < b.size(); ++i)f[i].imag(b[i]);
-		dft(f);
-		for (int i = 0; i < sz; ++i) {
-			f[i] = f[i] * f[i];
-			f[i] /= sz, f[i] /= 2;
-		}
-		idft(f);
-		Poly ans(tot);
-		for (int i = 0; i < tot; ++i)ans[i] = f[i].imag() + 0.5;
-		return ans;
-	}
-
-	friend Poly operator *(i64 a, Poly b) {
-		for (int i = 0; i < int(b.size()); i++) {
-			b[i] *= a;
-		}
-		return b;
-	}
-
-	friend Poly operator *(Poly a, i64 b) {
-		for (int i = 0; i < int(a.size()); i++) {
-			a[i] *= b;
-		}
-		return a;
-	}
-
-	Poly operator <<(const int k) const {
-		auto b = *this;
-		b.insert(b.begin(), k, 0);
-		return b;
-	}
-
-	Poly operator >>(const int k) const {
-		if (size() <= k) {
-			return {};
-		}
-		return {begin() + k, end()};
-	}
-
-	Poly& operator >>=(const int k) { return (*this) = (*this) >> k; }
-
-	Poly& operator <<=(const int k) { return (*this) = (*this) << k; }
-
-	Poly modxk(int k) const {
-		k = std::min(k, (int) size());
-		return {begin(), begin() + k};
-	}
-
-	Poly& operator +=(const Poly& b) { return (*this) = (*this) + b; }
-
-	Poly& operator -=(const Poly& b) { return (*this) = (*this) - b; }
-
-	Poly& operator *=(const Poly& b) { return (*this) = (*this) * b; }
 };
