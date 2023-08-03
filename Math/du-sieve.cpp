@@ -3,6 +3,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <unordered_map>
 
 using i64 = long long;
 
@@ -73,7 +74,7 @@ int main () {
     int t;
     std::cin >> t;
 
-    std::map<unsigned int, i64> Phi, Mu;
+    std::unordered_map<unsigned int, i64> Phi, Mu;
 
     while (t--) {
         int n;
