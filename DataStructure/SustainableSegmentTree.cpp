@@ -1,60 +1,77 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
 
-const int N = 1e5+10;
-using namespace std;
-struct sustainableSegmentTree{
-    int ls, rs, val;
-}T[N<<5];
-int n,m,tot,rt[N],a[N];
-int build(int l,int r){
-    int root = ++tot;
-    if(l == r)return root;
-    int m = l + r >> 1;
-    T[root].val = 0;
-    T[root].ls = build(l, m);
-    T[root].rs = build(m + 1, r);
-}
+template<typename T>
+struct SegmentTree {
+    struct Nod {
+        T sum;
+        int lc, rc;
 
-int upd(int k, int l, int r,int root){
-    int dir = ++tot;
-    T[dir].ls = T[root].ls, T[dir].rs = T[root].rs;
-    T[dir].val = T[root].val + 1;
-    if(l == r)return dir;
-    int m = l + r >> 1;
-    if(k <= m)T[dir].ls = upd(k, l , m, T[dir].ls);
-    else T[dir].rs = upd(k, m + 1, r, T[dir].rs);
-    return dir;
-}
+        Nod() : sum(0), lc(0), rc(0) {}
 
-int qry(int u,int v,int l, int r, int k){
-    int m = l + r >> 1;
-    int x = T[T[v].ls].val - T[T[u].ls].val;
-    if(l == r)return l;
-    if (k <= x)return qry(T[u].ls,T[v].ls,l,m,k);
-    else return qry(T[u].rs,T[v].rs,m+1,r,k-x);
-}
-int main(int argc, char const *argv[])
-{
-    tot = 0;
-    cin>> n>> m;
-    std::vector<int> lsh;
-    for(int i  = 1; i <= n; ++i){
-        cin>>a[i];
-        lsh.push_back(a[i]);
+        friend void apply(Nod &lsh, T v, int l, int r) {
+            lsh.sum += (r - l) * v;
+        }
+    };
+
+    std::vector<Nod> pool;
+    int lim_L, lim_R;
+
+    int size() {
+        return pool.size();
     }
-    sort(lsh.begin(), lsh.end());
-    lsh.erase(unique(lsh.begin(), lsh.end()),lsh.end());
-    int len = lsh.size();
-    rt[0]=build(1,len);
-    for(int i = 1; i <= n; ++i){
-        rt[i]=upd(lower_bound(lsh.begin(), lsh.end(),a[i])-lsh.begin()+1,1,len,rt[i-1]);
+
+    int newNode() {
+        pool.emplace_back();
+        return size() - 1;
     }
-    while(m--){
-        int l ,r, k;
-        cin>>l>>r>>k;
-        cout<<lsh[qry(rt[l-1],rt[r],1,len,k)-1]<<endl;
+
+    SegmentTree(int max = 1e9 + 10, int n = 1e4) : pool(), lim_L(0), lim_R(max) {
+        pool.reserve(n * 16);
+        newNode();
     }
-    return 0;
-}
+
+    void push_up(int x) {
+        pool[x].sum = pool[pool[x].lc].sum + pool[pool[x].rc].sum;
+    }
+
+    int update_peer(int p, int x, int v, int l, int r) {
+        int cur = newNode();
+        pool[cur] = pool[p];
+        if(l + 1 == r) {
+            apply(pool[cur], v, l, r);
+            return cur;
+        }
+
+        int mid = (l + r) >> 1;
+        if (x < mid) {
+            pool[cur].lc = update_peer(pool[cur].lc, x, v, l, mid);
+        } else {
+            pool[cur].rc = update_peer(pool[cur].rc, x, v, mid, r);
+        }
+
+        push_up(cur);
+        return cur;
+    }
+
+    int update_peer(int p, int x, int v) {
+        return update_peer(p, x, v, lim_L, lim_R);
+    }
+
+    std::array<int, 3> find_l_kth(int lp, int rp, int k, int l, int r) {
+        if (pool[rp].sum - pool[lp].sum < k) return {-1, -1, pool[rp].sum - pool[lp].sum};
+        if (l + 1 == r) {
+            return {l, k, pool[rp].sum - pool[lp].sum};
+        }
+        
+        int suml = pool[pool[rp].lc].sum - pool[pool[lp].lc].sum;
+        int mid = (l + r) >> 1;
+        if (suml >= k) {
+            return find_l_kth(pool[lp].lc, pool[rp].lc, k, l, mid);
+        } else {
+            return find_l_kth(pool[lp].rc, pool[rp].rc, k - suml, mid, r);
+        }
+    }
+
+    std::array<int, 3> find_l_kth(int lp, int rp, int k) {
+        return find_l_kth(lp, rp, k, lim_L, lim_R);
+    }
+};
