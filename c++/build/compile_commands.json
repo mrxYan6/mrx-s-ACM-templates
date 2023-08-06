@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/mrx/Library/CloudStorage/OneDrive-个人/codes/acm/stdLibrary/c++/build",
-  "command": "/usr/bin/clang++   -g -arch arm64 -std=gnu++17 -o CMakeFiles/library.dir/DataStructure/TwoDimensionFen.cpp.o -c /Users/mrx/Library/CloudStorage/OneDrive-个人/codes/acm/stdLibrary/DataStructure/TwoDimensionFen.cpp",
-  "file": "/Users/mrx/Library/CloudStorage/OneDrive-个人/codes/acm/stdLibrary/DataStructure/TwoDimensionFen.cpp"
-}
-]

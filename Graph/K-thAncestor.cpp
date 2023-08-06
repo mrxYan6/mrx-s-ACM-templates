@@ -1,4 +1,4 @@
-int f[N][N];//倍增，你懂的
+类似st表就行
 
 void dfs(int dpt,int x){
 	
