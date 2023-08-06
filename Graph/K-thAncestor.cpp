@@ -1,4 +1,4 @@
-类似st表就行
+// 类似st表就行
 
 void dfs(int dpt,int x){
 	
