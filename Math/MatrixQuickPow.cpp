@@ -37,7 +37,7 @@ struct matrix {
     matrix operator*(const matrix &rhs) {
         matrix ans(n, rhs.m);
         if (m != rhs.n) {
-           std::cerr << "Matrix not matching!";
+            std::cerr << "Matrix not matching!";
         }
         for (ll i = 0; i < n; ++i) {
             for (ll j = 0; j < m; ++j) {

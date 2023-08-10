@@ -1,6 +1,4 @@
-//
-// Created by mrx on 2022/8/4.
-//
+
 #include <vector>
 #include <cassert>
 #include <iostream>
