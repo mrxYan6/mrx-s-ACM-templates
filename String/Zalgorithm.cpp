@@ -1,3 +1,4 @@
+//z[0] = 0
 auto getz = [&] (std::string s) {
 	int n = s.length();
 	std::vector<int> z(n, 0);
@@ -17,3 +18,5 @@ auto getz = [&] (std::string s) {
 	}
 	return z;
 };
+
+//如果要求b的所有后缀对于a的LCP只需要求 a + "*" + b 的 Z algorithm 就行。
