@@ -1,5 +1,5 @@
 //z[0] = 0
-auto getz = [&] (std::string s) {
+auto z_algorithm = [&] (const std::string& s) {
 	int n = s.length();
 	std::vector<int> z(n, 0);
 	for (int i = 1, l = 0, r = 0; i < n; ++i) {
@@ -20,3 +20,10 @@ auto getz = [&] (std::string s) {
 };
 
 //如果要求b的所有后缀对于a的LCP只需要求 a + "*" + b 的 Z algorithm 就行。
+
+auto get_lcp = [&] (const std::string& text, const std::string& pattern) {
+	std::string cur = pattern + "*" + text;
+	int n = text.length(), m = pattern.length();
+	auto z = z_algorithm(cur);
+	return std::vector(z.begin() + m + 1, z.end());
+};
