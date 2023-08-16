@@ -1,5 +1,3 @@
-
-
 using i64 = long long;
 using db = double;
 constexpr db eps = 1e-6;
