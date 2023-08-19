@@ -1,9 +1,10 @@
-template<typename T, int N>
+
+template<typename T>
 struct LinearBasis{
     std::vector<T> p, d;
     int cnt, n;
 
-    LinearBasis(int n) : d(n + 1) {
+    LinearBasis(int n) : n(n) d(n + 1) {
         cnt = 0;
     }
 
