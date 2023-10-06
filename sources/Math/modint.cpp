@@ -183,6 +183,6 @@ private:
     Type value;
 };
 
-const i64 MOD = 1e9+7;
+const i64 MOD = 998244353;
 
 using Z = Modular<MOD>;
