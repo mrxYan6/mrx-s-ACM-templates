@@ -393,43 +393,24 @@ struct Poly : public std::vector<Z> {
 // }
 
 
-// // p = a * F, q = F, F = 1 - c
-// Z linearRecurrence(Poly p, Poly q, int n) {
-//     int m = q.size() - 1;
-//     while (n > 0) {
-//         auto newq = q;
-//         for (int i = 1; i <= m; i += 2) {
-//             newq[i] *= -1;
-//         }
-//         auto newp = p * newq;
-//         newq = q * newq;
-//         for (int i = 0; i < m; i++) {
-//             p[i] = newp[i * 2 + n % 2];
-//         }
-//         for (int i = 0; i <= m; i++) {
-//             q[i] = newq[i * 2];
-//         }
-//         n /= 2;
-//     }
-//     return p[0] / q[0];
-// }
-
-int main() {
-	Poly x{1, -1, -2, -6, -1, 0, 1};
-	Poly y{1, 0, 0, -1};
-	// auto t = x * y.inv(100);
-	Poly a;
-	a.resize(7);
-	a[6] = 1;
-	auto res = a * y / x;
-	std::cout << res.size() << "\n";
-	for (auto x : res) {
-		std::cout << x << " ";
-	}
-	// for (int i = 0; i < 100; ++i) {
-	// 	std::cout << t[i] << " ";
-	// }
-
+// p = a * F, q = F, F = 1 - c
+Z linearRecurrence(Poly p, Poly q, int n) {
+    int m = q.size() - 1;
+    while (n > 0) {
+        auto newq = q;
+        for (int i = 1; i <= m; i += 2) {
+            newq[i] *= -1;
+        }
+		// 可以变成暴力卷积
+        auto newp = p * newq;
+        newq = q * newq;
+        for (int i = 0; i < m; i++) {
+            p[i] = newp[i * 2 + n % 2];
+        }
+        for (int i = 0; i <= m; i++) {
+            q[i] = newq[i * 2];
+        }
+        n /= 2;
+    }
+    return p[0] / q[0];
 }
-//  1 1 3 10 23 62 170 441 1173 3127 8266 21937 58234 154390 409573 1086567 2882021 7645046 20279829 53794224 142696606 
-//  1 1 3 10 22 58 154 389 1006 2602 6691 17256 44500 114680 295645 762159 1964658 5064625 13055881 33655900 86759800 223653471 576543794 1486241011
