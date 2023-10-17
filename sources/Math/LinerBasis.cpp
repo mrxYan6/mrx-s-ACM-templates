@@ -1,12 +1,10 @@
 
-template<typename T>
+template<typename T, int N>
 struct LinearBasis{
-    std::vector<T> p, d;
+    std::array<T, N + 1> p, d;
     int cnt, n;
 
-    LinearBasis(int n) : n(n) d(n + 1) {
-        cnt = 0;
-    }
+    LinearBasis() : p(), d(), cnt(0), n(N) {}
 
     bool ins(T x) {
         for(int i = n; i >= 0; --i) {
@@ -61,5 +59,44 @@ struct LinearBasis{
             if((k >> i) & 1)ret ^= p[i];
         }
         return ret;
+    }
+};
+
+
+//支持区间查询用法: perf[r].max(l)
+template <typename T, typename N>
+struct LinearBasis{
+    std::array<T, N + 1> base;
+    std::array<T, N + 1> time;
+
+    LinearBasis() :base(), time(){}
+
+    void insert(int x, int t) {
+        
+        for (int i = N; i >= 0; --i) {
+            if (x >> i & 1) {
+                if (base[i] == 0) {
+                    base[i] = x;
+                    time[i] = t;
+                    break;
+                } else {
+                    if (t > time[i]) {
+                        std::swap(base[i], x);
+                        std::swap(t, time[i]);
+                    }
+                    x ^= base[i];
+                }
+            }
+        }
+    }
+
+    int max(int l) {
+        int res = 0;
+        for (int i = N; i >= 0; --i) {
+            if (time[i] >= l) {
+                res = std::max(res, res ^ base[i]);
+            }
+        }
+        return res;
     }
 };
