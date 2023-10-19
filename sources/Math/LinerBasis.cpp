@@ -64,7 +64,7 @@ struct LinearBasis{
 
 
 //支持区间查询用法: perf[r].max(l)
-template <typename T, typename N>
+template <typename T, int N>
 struct LinearBasis{
     std::array<T, N + 1> base;
     std::array<T, N + 1> time;
