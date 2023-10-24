@@ -14,14 +14,10 @@ $\lfloor\frac{n}{a*b} \rfloor = \lfloor \frac{\lfloor\frac{n}{a} \rfloor}{b}  \r
 证明如下: 假设 $n = a*t + y$，有 $y \le a- 1$, 则 $\lfloor\frac{n}{a} \rfloor = t$，然后证明 $\lfloor \frac{t}{b} \rfloor = \lfloor\frac{n}{a*b} \rfloor$假设 $t = b*k + x$，有 $x \le b-1$，则 $\lfloor \frac{t}{b} \rfloor = k$，用上面的展开式来表示 $\lfloor \frac{n}{a*b} \rfloor = \lfloor \frac{a*b*k + a*x+y}{a*b} \rfloor = k + \lfloor \frac{a*x+y}{a*b} \rfloor $由于 $x \le b-1 , y \le a -1$，则 $\lfloor \frac{a*x+y}{a*b} \rfloor = 0$，所以 $\lfloor\frac{n}{a*b} \rfloor = \lfloor \frac{\lfloor\frac{n}{a} \rfloor}{b}  \rfloor$
 
 ## gcdsum
-$$ \sum\limits_{i}^{n_1}\sum\limits_{j}^{n_2}...gcd(i, j,...) = 
-\\
-\sum\limits_{i}\sum\limits_{j}...\sum\limits_{x|gcd(i,j,...)}{\varphi(x)} = 
 
-\\
-
-\sum\limits_{x}\varphi(x) \prod\lfloor\frac{n_i}{x}\rfloor
-$$
+$$  \sum\limits_{i}^{n_1}\sum\limits_{j}^{n_2}...gcd(i, j,...) =  $$
+$$ \sum\limits_{i}\sum\limits_{j}...\sum\limits_{x|gcd(i,j,...)}{\varphi(x)} =  $$
+$$ \sum\limits_{x}\varphi(x) \prod\lfloor\frac{n_i}{x}\rfloor $$
 
 ## 分治fft求 $i < j$ 的卷积
 
