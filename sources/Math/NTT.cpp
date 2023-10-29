@@ -116,7 +116,7 @@ void dft(std::vector<Z>& a) {
 	for (int i = 0; i < n; ++i) {
 		if (rev[i] < i)std::swap(a[i], a[rev[i]]);
 	}
-	if (int(roots.size() < n)) {
+	if (int(roots.size()) < n) {
 		int k = __builtin_ctz(roots.size());
 		roots.resize(n);
 		while ((1 << k) < n) {
